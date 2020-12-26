@@ -1,68 +1,49 @@
-let game = {
-    "min": 1,
-    "max": 10
-};
+'use strict';
 
-document.addEventListener("DOMContentLoaded", function() {
-    //console.log("Ready");
-    game.output = document.querySelector(".output");
-    game.message = document.querySelector(".message");
-    game.guessInput = document.querySelector("input");
-    game.btn = document.querySelector("button");
-    game.btn.addEventListener("click", guessValue);
-    init();
-})
+const message = document.querySelector('.message');
+const scoreDOM = document.querySelector('.score');
+const numberDOM = document.querySelector('.number');
 
-function guessValue() {
+let secretNumber = Math.trunc(Math.random() * 20) + 1;
+let score = 20;
+let highscore = 0;
 
-    if (game.btn.classList.contains("replay")) {
-        init();
-        game.btn.innerHTML = "Guess";
-        game.guessInput.style.display = "block";
-        game.btn.classList.remove("replay");
-    } else {
-        game.guesses++;
-        let guessVar = parseInt(game.guessInput.value);
-        game.guessInput.value = "";
-        if (isNaN(guessVar)) {
-            //If user enters something other than digits
-            message("Please enter digits only ", "Red");
-        } else if (guessVar === game.num) {
-            //If user guessed the correct number
-            message("You guessed the correct number in " + game.guesses + " tries. ", "Green");
-            gameOver();
-        } else {
-            //If user guessed the wrong number
-            let holder = guessVar < game.num ? { "c": "orange", "m": "was lower" } : { "c": "purple", "m": "was higher" };
-            message("Nope :/ Incorrect. Guess " + holder.m, holder.c);
+document.querySelector('.check').addEventListener('click', function() {
+    const guess = Number(document.querySelector('.guess').value);
+
+    if (!guess) {
+        message.textContent = '🚫 No Number Found!!!!';
+    } else if (guess === secretNumber) {
+        message.textContent = '🎉 Correct Number...';
+
+        numberDOM.textContent = secretNumber;
+        document.querySelector('body').style.backgroundColor = '#31d101';
+        numberDOM.style.width = '30rem';
+
+        if (score > highscore) {
+            highscore = score;
+            document.querySelector('.highscore').textContent = highscore;
         }
-        //For testing purpose
-        //console.log(game.num);
+
+    } else if (guess !== secretNumber) {
+        if (score > 1) {
+            message.textContent = (guess > secretNumber) ? '📈 Too High!' : '📉 Too Low!';
+            score--;
+            scoreDOM.textContent = score;
+        } else {
+            message.textContent = '😭 You Lost The Round...';
+            scoreDOM.textContent = 0;
+        }
     }
-}
+});
 
-function gameOver() {
-    game.btn.innerHTML = "Restart Game";
-    game.guessInput.style.display = "none";
-    game.btn.classList.add("replay");
-    game.max += 5;
-}
-
-function init() {
-    game.guesses = 0;
-    game.num = randNum(game.min, game.max);
-    let tempMes = "Welcome to the game. Guess a number from " + game.min + " to " + game.max;
-    message(tempMes, "Blue");
-}
-
-function randNum(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function message(mess, color) {
-    game.message.innerHTML = mess;
-    game.message.style.color = color || "black";
-    game.guessInput.style.borderColor = color || "black";
-    game.btn.style.backgroundColor = color || "black";
-    game.btn.style.color = "white";
-}
+document.querySelector('.again').addEventListener('click', function() {
+    score = 20;
+    secretNumber = Math.trunc(Math.random() * 20) + 1;
+    message.textContent = 'Start Guessing...';
+    scoreDOM.textContent = score;
+    numberDOM.textContent = '?';
+    document.querySelector('.guess').textContent = '';
+    document.querySelector('body').style.backgroundColor = '#222';
+    numberDOM.style.width = '15rem';
+})
